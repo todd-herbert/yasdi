@@ -1,3 +1,10 @@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#
+# Modified to enable RS485 on Raspberry Pi
+#
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
 #
 #
 # CMAKE file for YASDI
@@ -12,6 +19,10 @@ IF(COMMAND CMAKE_POLICY)
    CMAKE_POLICY(SET CMP0003 OLD)
 ENDIF(COMMAND CMAKE_POLICY)
 
+
+# Raspi485 Test
+MESSAGE(STATUS "DE / RE will use GPIO ${PIN}")
+ADD_COMPILE_DEFINITIONS(GPIO_PIN_NUM=${PIN})
 
 
 #
@@ -126,7 +137,7 @@ if (WIN32)
 endif (WIN32) 
 if (UNIX)
    set(driv_ser_src ../../driver/serial_posix.c)
-   set(needed_libs dl pthread)
+   set(needed_libs dl pthread gpiod)
    # rt (=> for "aio")
 endif (UNIX)
 
