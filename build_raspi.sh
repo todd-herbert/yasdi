@@ -73,7 +73,7 @@ then
                 INTERACTIVE=True
                 do_serial
                 all_done
-                echo "(would reboot here)"
+                reboot
             }
             . raspi-config nonint prompt_serial
         else
@@ -83,4 +83,3 @@ fi
 
 # Completion dialog, but without reboot
 all_done
-echo "(no reboot)"
