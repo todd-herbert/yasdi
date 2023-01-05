@@ -1,11 +1,3 @@
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-//
-// Modified to enable RS485 on Raspberry Pi
-//
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-
-
 /**************************************************************************
 *         S M A Technologie AG, 34266 Niestetal
 ***************************************************************************
@@ -35,9 +27,9 @@
 *  V1.8.1Build8
 *  Revision 1.11 2009/10/13 16:40:44CEST Heiko Pruessing (pruessing) 
 *  div changes YASDI 1.8.1 Build 7
-*  Revision 1.10 2009/02/25 10:47:36CET Heiko Prï¿½ssing (pruessing) 
+*  Revision 1.10 2009/02/25 10:47:36CET Heiko Prüssing (pruessing) 
 *  1.8.1 build 1
-*  Revision 1.9 2008/08/13 13:39:11CEST Heiko Prï¿½ssing (pruessing) 
+*  Revision 1.9 2008/08/13 13:39:11CEST Heiko Prüssing (pruessing) 
 *  .
 *  Revision 1.8 2008/04/07 10:37:05CEST Heiko Prssing (pruessing) 
 *  .
@@ -78,8 +70,8 @@
 #include "copyright.h"
 #include "version.h"
 
-#include <gpiod.h> //Raspberry Pi RS485
-#include "raspi485.h"
+
+
 
 /**************************************************************************
 ***** LOCAL - Prototyps ***********************************************
@@ -118,24 +110,10 @@ static BYTE bPowerlineSyncPost[]={0x55,0x55};
 ***** MACROS  *************************************************************
 ***************************************************************************/
 
-//#define SET_RTS(f)    serial_modemstatus_set (f,  TIOCM_RTS)
-//#define SET_DTR(f)    serial_modemstatus_set (f,  TIOCM_DTR)
-//#define CLR_RTS(f)    serial_modemstatus_clr (f,  TIOCM_RTS)
-//#define CLR_DTR(f)    serial_modemstatus_clr (f,  TIOCM_DTR)
-
-
-// Raspi 485 modified
-// ---------------------
-// "I want to speak"
-#define SET_RTS(f)    raspi485_speak()
-#define CLR_DTR(f)    // Not needed, these args are only called in pairs
-
-// "I'm ready to listen"
-#define SET_DTR(f)    raspi485_listen()
-#define CLR_RTS(f)    // --
-// ---------------------
-
-
+#define SET_DTR(f)    serial_modemstatus_set (f,  TIOCM_DTR)
+#define SET_RTS(f)    serial_modemstatus_set (f,  TIOCM_RTS)
+#define CLR_RTS(f)    serial_modemstatus_clr (f,  TIOCM_RTS)
+#define CLR_DTR(f)    serial_modemstatus_clr (f,  TIOCM_DTR)
 #define IS_DCD_SET(f) serial_modem_get_status(f,  TIOCM_CD )
 
 #define CREATE_VAR_THIS(d,interface) interface this = (void*)((d)->priv)
@@ -222,7 +200,7 @@ SHARED_FUNCTION BOOL serial_open(TDevice * dev)
 
       // no handshake 
       options.c_cflag &= ~CRTSCTS;
-
+     
       // set new parameter
       tcsetattr(this->fd, TCSANOW, &options);
 
@@ -235,9 +213,6 @@ SHARED_FUNCTION BOOL serial_open(TDevice * dev)
          YASDI_DEBUG((VERBOSE_WARNING, "Serial: Unable to open serial port '%s' (ioctrl/FIOREAD had failed)\n", this->cPort));
          return FALSE;
       }
-
-      //Raspi485 -- start up the gpio
-      raspi485_begin();
 
       // device is now online
       dev->DeviceState = DS_ONLINE;
@@ -266,10 +241,6 @@ SHARED_FUNCTION void serial_release(TDevice * dev)
 
    if (this->fd >=0)
    {
-		// Raspberry Pi RS485
-		raspi485_end();
-
-
       close(this->fd);
       this->fd = -1;
    }
