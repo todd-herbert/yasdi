@@ -33,7 +33,7 @@ fi
 # Get to it then..
 # ==================
 
-apt-get install build-essential cmake libgpiod-dev
+apt-get -y install build-essential cmake libgpiod-dev
 rm -rf ./build
 mkdir build
 cd build
